@@ -1,13 +1,4 @@
-# Streamlit deployment requirements
-# Optimized for Streamlit Cloud
-
-# Core Streamlit
+# Simple Streamlit deployment - No OpenCV dependencies
 streamlit>=1.28.0
-
-# Computer Vision (Streamlit Cloud compatible)
-opencv-python-headless==4.8.1.78
-numpy>=1.24.0,<2.0.0
+numpy>=1.24.0
 Pillow>=10.0.0
-
-# Basic utilities
-python-dotenv>=1.0.0
