@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area Monitoring System - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🎯 Area Monitoring System</h1>
+                    <p>Real-time Person Detection & Alert System</p>
+                </div>
+                <div class="header-status">
+                    <div class="status-badge" id="systemStatus">
+                        <span class="status-dot"></span>
+                        <span>System Status</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active">
+                <div class="section-header">
+                    <h2>Dashboard</h2>
+                </div>
+
+                <!-- Live Camera Feed -->
+                <div class="card camera-card">
+                    <div class="camera-header">
+                        <h3>📷 Live Camera Feed</h3>
+                        <div class="camera-controls">
+                            <button class="btn-primary" id="cameraToggle">▶️ Start Camera</button>
+                            <button class="btn-secondary" id="beepToggleBtn">🔊 Turn On Beep</button>
+                        </div>
+                    </div>
+                    <div class="camera-container">
+                        <video id="cameraStream" class="camera-stream" autoplay muted playsinline></video>
+                        <canvas id="detectionCanvas" class="detection-canvas"></canvas>
+                        <div class="camera-overlay">
+                            <div class="overlay-info">
+                                <span id="cameraStatus">🔴 Camera: Offline</span>
+                                <span id="cameraFps">FPS: 0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="dashboard.js"></script>
+</body>
+</html>

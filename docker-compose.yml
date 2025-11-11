@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  area-monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: area-monitor
+    restart: unless-stopped
+    environment:
+      - CAMERA_INDEX=0
+      - CONFIDENCE_THRESHOLD=0.5
+      - ALERT_ENABLED=true
+      - AUTO_SCREENSHOT=true
+      - DEBUG=false
+    volumes:
+      - ./logs:/app/logs
+      - ./screenshots:/app/screenshots
+      - ./area_monitor.db:/app/area_monitor.db
+      - /dev/video0:/dev/video0  # Webcam device (Linux)
+    devices:
+      - /dev/video0:/dev/video0  # Webcam device
+    ports:
+      - "8000:8000"  # For future API
+    healthcheck:
+      test: ["CMD", "python", "-c", "import cv2; print('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Optional: Prometheus for monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+
+  # Optional: Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus_data:
+  grafana_data:
