@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area Monitoring System - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🎯 Area Monitoring System</h1>
+                    <p>Real-time Person Detection & Zone Monitoring</p>
+                </div>
+                <div class="header-status">
+                    <div class="status-badge" id="systemStatus">
+                        <span class="status-dot"></span>
+                        <span>System Status</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="navbar">
+            <ul class="nav-menu">
+                <li><a href="#dashboard" class="nav-link active" onclick="showSection('dashboard')">Dashboard</a></li>
+                <li><a href="#alerts" class="nav-link" onclick="showSection('alerts')">Alerts</a></li>
+                <li><a href="#zones" class="nav-link" onclick="showSection('zones')">Zones</a></li>
+                <li><a href="#statistics" class="nav-link" onclick="showSection('statistics')">Statistics</a></li>
+                <li><a href="#settings" class="nav-link" onclick="showSection('settings')">Settings</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active">
+                <div class="section-header">
+                    <h2>Dashboard</h2>
+                    <button class="btn-refresh" onclick="refreshDashboard()">🔄 Refresh</button>
+                </div>
+
+                <!-- Key Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">📊</div>
+                        <div class="metric-content">
+                            <h3>FPS</h3>
+                            <p class="metric-value" id="fps">0.0</p>
+                            <p class="metric-label">Frames/Second</p>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">👥</div>
+                        <div class="metric-content">
+                            <h3>Detections</h3>
+                            <p class="metric-value" id="detections">0</p>
+                            <p class="metric-label">Current Frame</p>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">🚨</div>
+                        <div class="metric-content">
+                            <h3>Alerts</h3>
+                            <p class="metric-value" id="alertCount">0</p>
+                            <p class="metric-label">Last 24 Hours</p>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon">⏱️</div>
+                        <div class="metric-content">
+                            <h3>Uptime</h3>
+                            <p class="metric-value" id="uptime">0h</p>
+                            <p class="metric-label">System Running</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Camera Feed -->
+                <div class="card camera-card">
+                    <div class="camera-header">
+                        <h3>📷 Live Camera Feed</h3>
+                        <div class="camera-controls">
+                            <button class="btn-primary" id="cameraToggle">▶️ Start Camera</button>
+                            <button class="btn-secondary" id="screenshotBtn">📸 Screenshot</button>
+                        </div>
+                    </div>
+                    <div class="camera-container">
+                        <video id="cameraStream" class="camera-stream" autoplay muted playsinline></video>
+                        <canvas id="detectionCanvas" class="detection-canvas"></canvas>
+                        <div class="camera-overlay">
+                            <div class="overlay-info">
+                                <span id="cameraStatus">🔴 Camera: Offline</span>
+                                <span id="cameraFps">FPS: 0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Feed & Stats -->
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>System Status</h3>
+                        <div class="status-info">
+                            <div class="status-item">
+                                <span>Status:</span>
+                                <span class="status-value" id="status">🟢 Running</span>
+                            </div>
+                            <div class="status-item">
+                                <span>Camera:</span>
+                                <span class="status-value" id="camera">Default Camera (640x480)</span>
+                            </div>
+                            <div class="status-item">
+                                <span>Detection Model:</span>
+                                <span class="status-value">YOLOv8n</span>
+                            </div>
+                            <div class="status-item">
+                                <span>Confidence Threshold:</span>
+                                <span class="status-value" id="confidence">0.5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Performance Metrics</h3>
+                        <div class="performance-chart">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Alerts Section -->
+            <section id="alerts" class="section">
+                <div class="section-header">
+                    <h2>Recent Alerts</h2>
+                    <div class="alert-controls">
+                        <select id="alertFilter" onchange="filterAlerts()">
+                            <option value="">All Levels</option>
+                            <option value="info">Info</option>
+                            <option value="warning">Warning</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                        <button class="btn-secondary" onclick="clearAlerts()">Clear All</button>
+                    </div>
+                </div>
+
+                <div class="alerts-container" id="alertsList">
+                    <p class="empty-state">No alerts yet</p>
+                </div>
+            </section>
+
+            <!-- Zones Section -->
+            <section id="zones" class="section">
+                <div class="section-header">
+                    <h2>Monitoring Zones</h2>
+                    <button class="btn-primary" onclick="addZone()">+ Add Zone</button>
+                </div>
+
+                <div class="zones-grid" id="zonesList">
+                    <p class="empty-state">No zones configured</p>
+                </div>
+
+                <!-- Zone Form Modal -->
+                <div id="zoneModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeZoneModal()">&times;</span>
+                        <h2>Add/Edit Zone</h2>
+                        <form id="zoneForm" onsubmit="saveZone(event)">
+                            <div class="form-group">
+                                <label>Zone Name</label>
+                                <input type="text" id="zoneName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Zone Type</label>
+                                <select id="zoneType" required>
+                                    <option value="polygon">Polygon</option>
+                                    <option value="rectangle">Rectangle</option>
+                                    <option value="circle">Circle</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Alert on Entry</label>
+                                <input type="checkbox" id="alertOnEntry" checked>
+                            </div>
+                            <button type="submit" class="btn-primary">Save Zone</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statistics Section -->
+            <section id="statistics" class="section">
+                <div class="section-header">
+                    <h2>Statistics</h2>
+                    <div class="stats-controls">
+                        <select id="statsRange" onchange="updateStatistics()">
+                            <option value="24">Last 24 Hours</option>
+                            <option value="7">Last 7 Days</option>
+                            <option value="30">Last 30 Days</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="card">
+                        <h3>Detection Trend</h3>
+                        <canvas id="detectionChart"></canvas>
+                    </div>
+                    <div class="card">
+                        <h3>Alert Distribution</h3>
+                        <canvas id="alertChart"></canvas>
+                    </div>
+                    <div class="card">
+                        <h3>Zone Activity</h3>
+                        <canvas id="zoneChart"></canvas>
+                    </div>
+                    <div class="card">
+                        <h3>System Performance</h3>
+                        <canvas id="systemChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="section">
+                <div class="section-header">
+                    <h2>Settings</h2>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="card">
+                        <h3>Camera Settings</h3>
+                        <div class="form-group">
+                            <label>Camera Index</label>
+                            <input type="number" id="cameraIndex" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Resolution</label>
+                            <select id="resolution">
+                                <option value="320x240">320x240</option>
+                                <option value="640x480" selected>640x480</option>
+                                <option value="1280x720">1280x720</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>Detection Settings</h3>
+                        <div class="form-group">
+                            <label>Confidence Threshold</label>
+                            <input type="range" id="confidenceSlider" min="0.1" max="1" step="0.1" value="0.5" oninput="updateConfidenceLabel()">
+                            <span id="confidenceLabel">0.5</span>
+                        </div>
+                        <div class="form-group">
+                            <label>NMS Threshold</label>
+                            <input type="range" id="nmsSlider" min="0.1" max="1" step="0.1" value="0.5" oninput="updateNmsLabel()">
+                            <span id="nmsLabel">0.5</span>
+                        </div>
+                        <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>Alert Settings</h3>
+                        <div class="form-group">
+                            <label>Alert Cooldown (seconds)</label>
+                            <input type="number" id="alertCooldown" min="1" value="5">
+                        </div>
+                        <div class="form-group">
+                            <label>Max Alerts per Minute</label>
+                            <input type="number" id="maxAlerts" min="1" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Enable Sound</label>
+                            <input type="checkbox" id="soundEnabled" checked>
+                        </div>
+                        <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>System Actions</h3>
+                        <button class="btn-secondary" onclick="restartSystem()">🔄 Restart System</button>
+                        <button class="btn-danger" onclick="shutdownSystem()">⛔ Shutdown System</button>
+                        <button class="btn-secondary" onclick="exportData()">📥 Export Data</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 Area Monitoring System v2.0.0 | Production Grade</p>
+            <p>Last Updated: <span id="lastUpdate">--:--:--</span></p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

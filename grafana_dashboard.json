@@ -1,0 +1,215 @@
+{
+  "dashboard": {
+    "title": "Area Monitoring System",
+    "description": "Real-time monitoring dashboard for Area Monitoring System",
+    "tags": ["area-monitor", "monitoring"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "title": "System Status",
+        "type": "stat",
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "up{job=\"area-monitor\"}",
+            "legendFormat": "Status"
+          }
+        ]
+      },
+      {
+        "title": "FPS",
+        "type": "graph",
+        "gridPos": {
+          "x": 6,
+          "y": 0,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "rate(frames_processed_total[1m])",
+            "legendFormat": "FPS"
+          }
+        ]
+      },
+      {
+        "title": "Detections per Minute",
+        "type": "graph",
+        "gridPos": {
+          "x": 12,
+          "y": 0,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "rate(detections_total[1m]) * 60",
+            "legendFormat": "Detections/min"
+          }
+        ]
+      },
+      {
+        "title": "Memory Usage",
+        "type": "graph",
+        "gridPos": {
+          "x": 18,
+          "y": 0,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "container_memory_usage_bytes{name=\"area-monitor\"} / 1e9",
+            "legendFormat": "Memory (GB)"
+          }
+        ]
+      },
+      {
+        "title": "CPU Usage",
+        "type": "graph",
+        "gridPos": {
+          "x": 0,
+          "y": 4,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "rate(container_cpu_usage_seconds_total{name=\"area-monitor\"}[1m]) * 100",
+            "legendFormat": "CPU %"
+          }
+        ]
+      },
+      {
+        "title": "Alerts",
+        "type": "graph",
+        "gridPos": {
+          "x": 6,
+          "y": 4,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "rate(alerts_total[1m]) * 60",
+            "legendFormat": "Alerts/min"
+          }
+        ]
+      },
+      {
+        "title": "Zone Occupancy",
+        "type": "graph",
+        "gridPos": {
+          "x": 12,
+          "y": 4,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "zone_current_occupancy",
+            "legendFormat": "{{ zone_id }}"
+          }
+        ]
+      },
+      {
+        "title": "API Response Time",
+        "type": "graph",
+        "gridPos": {
+          "x": 18,
+          "y": 4,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "p95 Response Time"
+          }
+        ]
+      },
+      {
+        "title": "Database Size",
+        "type": "stat",
+        "gridPos": {
+          "x": 0,
+          "y": 8,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "database_size_bytes / 1e9",
+            "legendFormat": "Size (GB)"
+          }
+        ]
+      },
+      {
+        "title": "Uptime",
+        "type": "stat",
+        "gridPos": {
+          "x": 6,
+          "y": 8,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "(time() - process_start_time_seconds) / 3600",
+            "legendFormat": "Hours"
+          }
+        ]
+      },
+      {
+        "title": "Error Rate",
+        "type": "graph",
+        "gridPos": {
+          "x": 12,
+          "y": 8,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{status=~\"5..\"}[5m]) * 100",
+            "legendFormat": "Error %"
+          }
+        ]
+      },
+      {
+        "title": "Active Tracks",
+        "type": "graph",
+        "gridPos": {
+          "x": 18,
+          "y": 8,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "active_tracks",
+            "legendFormat": "Tracks"
+          }
+        ]
+      }
+    ],
+    "refresh": "10s",
+    "schemaVersion": 27,
+    "style": "dark",
+    "templating": {
+      "list": [
+        {
+          "name": "zone_id",
+          "type": "query",
+          "datasource": "Prometheus",
+          "query": "label_values(zone_current_occupancy, zone_id)"
+        }
+      ]
+    }
+  }
+}
