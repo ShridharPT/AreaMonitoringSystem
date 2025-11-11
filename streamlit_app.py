@@ -5,7 +5,6 @@ Real-time person detection with OpenCV
 """
 
 import streamlit as st
-import cv2
 import numpy as np
 import time
 from datetime import datetime
@@ -14,6 +13,16 @@ import queue
 from PIL import Image
 import io
 import base64
+
+# Try to import OpenCV with fallback
+try:
+    import cv2
+    OPENCV_AVAILABLE = True
+    st.success("✅ OpenCV loaded successfully!")
+except ImportError as e:
+    OPENCV_AVAILABLE = False
+    st.error(f"❌ OpenCV not available: {str(e)}")
+    st.info("🎨 Running in Demo Mode - Interface will work without camera functionality")
 
 # Configure Streamlit page
 st.set_page_config(
@@ -117,6 +126,9 @@ def detect_person_advanced(frame):
     Advanced person detection using motion and skin tone analysis
     Similar to your original dashboard.js algorithm
     """
+    if not OPENCV_AVAILABLE:
+        return False, [], frame
+    
     height, width = frame.shape[:2]
     
     # Convert to different color spaces
@@ -306,6 +318,19 @@ def main():
                 camera_placeholder = st.empty()
                 
                 try:
+                    # Check if OpenCV is available
+                    if not OPENCV_AVAILABLE:
+                        st.error("❌ OpenCV not available!")
+                        st.info("""
+                        **Demo Mode Active**
+                        - OpenCV is not available in this environment
+                        - The interface is fully functional for demonstration
+                        - Camera features work when OpenCV is properly installed
+                        - Perfect for showcasing the UI and detection algorithms
+                        """)
+                        st.session_state.camera_active = False
+                        return
+                    
                     # Try to initialize camera
                     cap = cv2.VideoCapture(0)
                     
