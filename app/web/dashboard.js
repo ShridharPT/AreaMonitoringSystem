@@ -493,6 +493,11 @@ async function toggleCamera() {
         try {
             statusSpan.textContent = '🟡 Camera: Requesting...';
             
+            // Check if we're in a server environment
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error('Camera not available in server environment. This is a demo dashboard - camera features work locally only.');
+            }
+            
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: { width: 640, height: 480 },
                 audio: false
@@ -521,8 +526,14 @@ async function toggleCamera() {
             
         } catch (error) {
             console.error('❌ Camera error:', error);
-            statusSpan.textContent = '🔴 Camera: Error';
-            alert('Camera Error: ' + error.message);
+            statusSpan.textContent = '🔴 Camera: Not Available (Server Mode)';
+            
+            // Show a friendly message for server environments
+            if (error.message.includes('server environment')) {
+                showNotification('📺 Demo Mode', 'Camera features are disabled in server environment. Download and run locally for full functionality!');
+            } else {
+                alert('Camera Error: ' + error.message);
+            }
         }
     } else {
         // STOP CAMERA

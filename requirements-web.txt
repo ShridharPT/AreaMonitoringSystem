@@ -1,0 +1,12 @@
+# Web-only requirements for Render deployment
+# Minimal dependencies without OpenCV/AI libraries
+
+# Web framework and API
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.0.0
+python-multipart>=0.0.6
+
+# Basic utilities
+python-dotenv>=1.0.0
+requests>=2.31.0
